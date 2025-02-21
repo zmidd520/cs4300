@@ -28,8 +28,13 @@ class Seat(models.Model):
     seatNum = models.CharField(max_length=50, choices=SEATS, unique=True)
     status = models.CharField(max_length=50, choices=STATUS)
 
+    # make seat selection unique on a per-movie basis
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ('movie', 'seatNum')
+
 class Booking(models.Model):
     movie = models.CharField(choices=[movie.title for movie in Movie.objects.all()])
-    seat = models.CharField(choices=[seat.seatNum for seat in Seat.objects.all() if seat.status != 'R'])  # only display available seats
+    seat = models.CharField(choices=[seat.seatNum for seat in Seat.objects.all()], unique_for_date=date, unique=True)  # only display available seats for the given date
     user = models.OneToOneField(User)
     date = models.DateField(default=None)
