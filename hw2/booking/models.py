@@ -11,12 +11,12 @@ class Movie(models.Model):
 class Seat(models.Model):
     # choices for seat number
     SEATS = (
-        (1, 'A1'),  (2, 'A2'),  (3, 'A3'),  (4, 'A4'),  (5, 'A5'),  (6, 'A6'),  (7, 'A7'),       
-        (8, 'B1'),  (9, 'B2'),  (10, 'B3'), (11, 'B4'), (12, 'B5'), (13, 'B6'), (14, 'B7'),   
-        (15, 'C1'), (16, 'C2'), (17, 'C3'), (18, 'C4'), (19, 'C5'), (20, 'C6'), (21, 'C7'),   
-        (22, 'D1'), (23, 'D2'), (24, 'D3'), (25, 'D4'), (26, 'D5'), (27, 'D6'), (28, 'D7'),   
-        (29, 'E1'), (30, 'E2'), (31, 'E3'), (32, 'E4'), (33, 'E5'), (34, 'E6'), (35, 'E7'),
-        (36, 'F1'), (37, 'F2'), (38, 'F3'), (39, 'F4'), (40, 'F5'), (41, 'F6'), (42, 'F7')    
+        (1, 'A1'),  (2, 'A2'),  (3, 'A3'),  (4, 'A4'),  (5, 'A5'),        
+        (6, 'B1'),  (7, 'B2'),  (8, 'B3'), (9, 'B4'), (10, 'B5'),    
+        (11, 'C1'), (12, 'C2'), (13, 'C3'), (14, 'C4'), (15, 'C5'),    
+        (16, 'D1'), (17, 'D2'), (18, 'D3'), (19, 'D4'), (20, 'D5'),   
+        (21, 'E1'), (22, 'E2'), (23, 'E3'), (24, 'E4'), (25, 'E5'), 
+        (26, 'F1'), (27, 'F2'), (28, 'F3'), (29, 'F4'), (30, 'F5')    
     )
 
     # choices for seat status
@@ -30,11 +30,15 @@ class Seat(models.Model):
 
     # make seat selection unique on a per-movie basis
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+
+    def get_absolute_url(self):
+        return reverse('movie_seats', args=[str(self.movie.id)])
+
     class Meta:
         unique_together = ('movie', 'seatNum')
 
 class Booking(models.Model):
     date = models.DateField(default=None)
-    movie = models.CharField(choices=[movie.title for movie in Movie.objects.all()], max_length=100)
+    movie = models.CharField(choices=[(movie.id, movie.title) for movie in Movie.objects.all()], max_length=100)
     seat = models.CharField(choices=[seat.seatNum for seat in Seat.objects.all()], max_length=10, unique_for_date=date, unique=True)  # only display available seats for the given date
     user = models.OneToOneField(User, on_delete=models.CASCADE)

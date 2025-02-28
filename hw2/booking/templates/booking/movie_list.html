@@ -1,13 +1,11 @@
-<!-- inherit from base.html -->
 {% extends 'booking/base_template.html' %}
 
 
-<!-- Replace block content in base_template.html -->
 {% block content %}
     {% if movies %}
     <ul class="list-group">
         {% for movie in movies %}
-        <li class="list-group-item {{reminder.color}}">
+        <li class="list-group-item">
             <p><strong>{{ movie.title }}</strong></p>
         </li>
         {% endfor %}

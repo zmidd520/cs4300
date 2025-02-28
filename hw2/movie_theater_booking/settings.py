@@ -72,6 +72,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'movie_theater_booking.wsgi.application'
 
+CSRF_TRUSTED_ORIGINS = ['https://editor-zmiddlet-5.devedu.io']
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

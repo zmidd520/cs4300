@@ -1,0 +1,16 @@
+{% extends 'booking/base_template.html' %}
+
+
+{% block content %}
+    <h2>Available Seats</h2>
+    <ul class="list-group">
+        {% for seat in seats %}
+        <li class="list-group-item">
+            {% if seat.status == 'A' %}
+            <p><strong>{{ seat.seatNum }}</strong></p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    
+{% endblock %}
