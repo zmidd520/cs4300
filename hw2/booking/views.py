@@ -43,41 +43,6 @@ def book_seat(request, movie_id):
     context = {'movie': movie, 'form': form}
     return render(request, 'booking/booking_form.html', context)
 
-def add_movie(request):
-    form = MovieForm()
-
-    if request.method == "POST":
-        movie_data = request.POST.copy()
-
-        # get form data
-        form = MovieForm(movie_data)
-
-        if form.is_valid():
-            movie = form.save(commit=False)
-            movie.save()
-
-       
-    context = {'form': form}
-    return render(request, 'booking/movie_form.html', context)
-
-def add_seat(request):
-    form = SeatForm()
-
-    if request.method == "POST":
-        # make dictionary with user id and reminder data
-        seat_data = request.POST.copy()
-
-        # get form data
-        form = SeatForm(seat_data)
-
-        if form.is_valid():
-            seat = form.save(commit=False)
-            seat.save()
-
-       
-    context = {'form': form}
-    return render(request, 'booking/seat_form.html', context)
-
 def registerPage(request):
       form = CreateUserForm()
 
@@ -97,6 +62,11 @@ def registerPage(request):
       context = {'form': form}
       return render(request, 'registration/register.html', context)
 
+class MovieViewSet(viewsets.ModelViewSet):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+
+'''
 # ViewSets
 class MovieViewSet(viewsets.ViewSet):
     
@@ -104,3 +74,13 @@ class MovieViewSet(viewsets.ViewSet):
         queryset = Movies.objects.all()
         serializer = MovieSerializer(queryset, many=True)
         return Response(serializer.data)
+
+    def create(self, request):
+        
+    
+    def retrieve(self, request, pk=None):
+        queryset = Movie.objects.all()
+        movie = get_object_or_404(queryset, pk=pk)
+        serializer = MovieSerializer(user)
+        return Response(serializer.data)
+'''

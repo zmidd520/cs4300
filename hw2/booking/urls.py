@@ -1,16 +1,21 @@
 from django.urls import include, path
 from . import views
+from rest_framework import routers
+
+# Router setup
+router = routers.DefaultRouter()
+router.register(r'movies', views.MovieViewSet)
 
 urlpatterns = [
+    # api
+    path('api/', include(router.urls)),
+
     # index/movie list
     path('', views.movie_list, name='movie_list'),
 
-    # debug urls to add non-user-created models
-    path('movies/add', views.add_movie, name='add_movie'),
-
     # booking
     path('book/<int:movie_id>', views.book_seat, name='book_seat'),
-    path('<int:user_id>/bookings', views.booking_list, name='booking_list'),
+    path('user/<int:user_id>/bookings', views.booking_list, name='booking_list'),
 
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', views.registerPage, name='register_page')
