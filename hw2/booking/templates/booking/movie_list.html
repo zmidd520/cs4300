@@ -7,6 +7,8 @@
         {% for movie in movies %}
         <li class="list-group-item">
             <p><strong>{{ movie.title }}</strong></p>
+            <p>{{ movie.description }}</p>
+            <a class="btn btn-primary" href="{% url 'book_seat' movie.id %}" role="button">Book Seat</a>
         </li>
         {% endfor %}
     </ul>

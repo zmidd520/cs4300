@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # Create your models here.
 class Movie(models.Model):
@@ -11,12 +12,11 @@ class Movie(models.Model):
 class Seat(models.Model):
     # choices for seat number
     SEATS = (
-        (1, 'A1'),  (2, 'A2'),  (3, 'A3'),  (4, 'A4'),  (5, 'A5'),        
-        (6, 'B1'),  (7, 'B2'),  (8, 'B3'), (9, 'B4'), (10, 'B5'),    
-        (11, 'C1'), (12, 'C2'), (13, 'C3'), (14, 'C4'), (15, 'C5'),    
-        (16, 'D1'), (17, 'D2'), (18, 'D3'), (19, 'D4'), (20, 'D5'),   
-        (21, 'E1'), (22, 'E2'), (23, 'E3'), (24, 'E4'), (25, 'E5'), 
-        (26, 'F1'), (27, 'F2'), (28, 'F3'), (29, 'F4'), (30, 'F5')    
+        ('A1', 'A1'),  ('A2', 'A2'),  ('A3', 'A3'),  ('A4', 'A4'),  ('A5', 'A5'),        
+        ('B1', 'B1'),  ('B2', 'B2'),  ('B3', 'B3'),  ('B4', 'B4'),  ('B5', 'B5'), 
+        ('C1', 'C1'),  ('C2', 'C2'),  ('C3', 'C3'),  ('C4', 'C4'),  ('C5', 'C5'),    
+        ('D1', 'D1'),  ('D2', 'D2'),  ('D3', 'D3'),  ('D4', 'D4'),  ('D5', 'D5'),   
+        ('E1', 'E1'),  ('E2', 'E2'),  ('E3', 'E3'),  ('E4', 'E4'),  ('E5', 'E5')  
     )
 
     # choices for seat status
@@ -26,19 +26,17 @@ class Seat(models.Model):
     )
 
     seatNum = models.CharField(max_length=50, choices=SEATS, unique=True)
-    status = models.CharField(max_length=50, choices=STATUS)
-
-    # make seat selection unique on a per-movie basis
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-
-    def get_absolute_url(self):
-        return reverse('movie_seats', args=[str(self.movie.id)])
-
-    class Meta:
-        unique_together = ('movie', 'seatNum')
+    status = models.CharField(max_length=50, choices=STATUS) 
 
 class Booking(models.Model):
-    date = models.DateField(default=None)
-    movie = models.CharField(choices=[(movie.id, movie.title) for movie in Movie.objects.all()], max_length=100)
-    seat = models.CharField(choices=[seat.seatNum for seat in Seat.objects.all()], max_length=10, unique_for_date=date, unique=True)  # only display available seats for the given date
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    movie = models.CharField(choices=[(movie.title, movie.title) for movie in Movie.objects.all()], max_length=100)
+    date = models.DateField(default=timezone.now())
+    seat = models.CharField(choices=[(seat.seatNum, seat.seatNum) for seat in Seat.objects.all() if seat.status != 'R'], max_length=10, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    seat.status = 'R'
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['movie', 'seat'], name='one_seat_per_person')
+        ]

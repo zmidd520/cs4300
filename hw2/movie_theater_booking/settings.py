@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-fv0no!1mu-e&zjw$g5!pmjh)i9k^u_kcl3!ydcb7$g(b4_8ysp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['editor-zmiddlet-5.devedu.io']
+ALLOWED_HOSTS = ['editor-zmiddlet-5.devedu.io', 'app-zmiddlet-5.devedu.io']
 
 
 # Application definition
@@ -72,7 +72,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'movie_theater_booking.wsgi.application'
 
-CSRF_TRUSTED_ORIGINS = ['https://editor-zmiddlet-5.devedu.io']
+CSRF_TRUSTED_ORIGINS = ['https://editor-zmiddlet-5.devedu.io', 'https://app-zmiddlet-5.devedu.io']
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
