@@ -15,7 +15,7 @@ class SeatForm(ModelForm):
 class BookingForm(ModelForm):
     class Meta:
         model = Booking
-        fields = ('movie', 'date', 'seat')
+        fields = ('date', 'seat')
         exclude = ['user']
 
 class CreateUserForm(UserCreationForm):

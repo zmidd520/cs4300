@@ -31,10 +31,14 @@ class Seat(models.Model):
 class Booking(models.Model):
     movie = models.CharField(choices=[(movie.title, movie.title) for movie in Movie.objects.all()], max_length=100)
     date = models.DateField(default=timezone.now())
-    seat = models.CharField(choices=[(seat.seatNum, seat.seatNum) for seat in Seat.objects.all() if seat.status != 'R'], max_length=10, unique=True)
+    seat = models.CharField(choices=[(seat.seatNum, seat.seatNum) for seat in Seat.objects.all() if seat.status != 'R'], max_length=10, unique_for_date='date', unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    seat.status = 'R'
+    for seatInst in Seat.objects.all():
+        if seatInst.seatNum == seat:
+            seatInst.status = 'R'
+            seatInst.save()
+            break
 
     class Meta:
         constraints = [

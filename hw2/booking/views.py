@@ -4,6 +4,7 @@ from .forms import *
 from django.views import generic
 from rest_framework import viewsets
 from rest_framework.response import Response
+from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from booking.serializers import MovieSerializer
@@ -13,6 +14,13 @@ def movie_list(request):
     movies = Movie.objects.all()
     context = {'movies': movies}
     return render(request, 'booking/movie_list.html', context)
+
+@login_required
+def booking_list(request, user_id):
+    bookings = Booking.objects.all()
+
+    context = {'bookings': bookings}
+    return render(request, 'booking/booking_list.html', context)
 
 @login_required
 def book_seat(request, movie_id):
@@ -27,8 +35,10 @@ def book_seat(request, movie_id):
         if form.is_valid():
             booking = form.save(commit=False)
             booking.user = request.user
+            booking.movie = movie.title
             booking.save()
-        return(redirect('movie_list'))
+            messages.success(request, "Seat booked!")
+        return(redirect('booking_list', request.user.id))
     
     context = {'movie': movie, 'form': form}
     return render(request, 'booking/booking_form.html', context)
