@@ -6,10 +6,20 @@
 
 <h3>Book a Seat for {{ movie.title }}</h3>
 
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
 <form action="" method="POST">
 
 
     {% csrf_token %}
+    {{ errors }}
+
     <table>
         {{ form.as_table }}
     </table>

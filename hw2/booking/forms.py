@@ -1,22 +1,27 @@
-from django.forms import ModelForm
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import *
 
-class MovieForm(ModelForm):
+class MovieForm(forms.ModelForm):
     class Meta: 
         model = Movie 
         fields = ('title', 'description', 'releaseDate', 'duration')
 
-class SeatForm(ModelForm):
+class SeatForm(forms.ModelForm):
     class Meta: 
         model = Seat
         fields = ('seatNum', 'status')
 
-class BookingForm(ModelForm):
+class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = ('date', 'seat')
-        exclude = ['user']
+
+        error_messages = {
+            'seat': {
+                'unique_for_date': "This seat is reserved, please choose a different seat",
+                'one_seat_per_person': "This seat is reserved, please choose a different seat"},
+        }
 
 class CreateUserForm(UserCreationForm):
     class Meta:

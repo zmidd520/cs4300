@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.db import IntegrityError
 from .models import *
 from .forms import *
 from django.views import generic
@@ -27,20 +28,33 @@ def book_seat(request, movie_id):
     movie = Movie.objects.get(pk=movie_id)
     form = BookingForm()
 
+    context = {'movie': movie, 'form': form}
+
     if request.method == "POST":
         booking_data = request.POST.copy()
 
         form = BookingForm(booking_data)
-
+        
         if form.is_valid():
             booking = form.save(commit=False)
             booking.user = request.user
             booking.movie = movie.title
-            booking.save()
-            messages.success(request, "Seat booked!")
+
+            # attempt to book seat
+            try:
+                booking.save()
+                messages.success(request, "Seat booked!")
+
+            # error occurs if seat is booked
+            except IntegrityError:
+                messages.error(request, "That seat has been booked for this day, please choose a different seat or book for a later date")
+                return render(request, 'booking/booking_form.html', context)
+        else:        
+            messages.error(request, "Something went wrong, try booking again")  
+            return render(request, 'booking/booking_form.html', context)
+
         return(redirect('booking_list', request.user.id))
     
-    context = {'movie': movie, 'form': form}
     return render(request, 'booking/booking_form.html', context)
 
 def registerPage(request):
@@ -65,22 +79,3 @@ def registerPage(request):
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-
-'''
-# ViewSets
-class MovieViewSet(viewsets.ViewSet):
-    
-    def list(self, request):
-        queryset = Movies.objects.all()
-        serializer = MovieSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def create(self, request):
-        
-    
-    def retrieve(self, request, pk=None):
-        queryset = Movie.objects.all()
-        movie = get_object_or_404(queryset, pk=pk)
-        serializer = MovieSerializer(user)
-        return Response(serializer.data)
-'''

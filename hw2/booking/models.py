@@ -9,6 +9,9 @@ class Movie(models.Model):
     releaseDate = models.DateField(default=None)
     duration = models.TimeField()
 
+    def __str__(self):
+        return self.title
+
 class Seat(models.Model):
     # choices for seat number
     SEATS = (
@@ -25,22 +28,19 @@ class Seat(models.Model):
         ('A', 'Available')
     )
 
-    seatNum = models.CharField(max_length=50, choices=SEATS, unique=True)
-    status = models.CharField(max_length=50, choices=STATUS) 
+    seatNum = models.CharField(max_length=50, choices=SEATS)
+    status = models.CharField(max_length=50, choices=STATUS, default='A') 
+
+    def __str__(self):
+        return self.seatNum
 
 class Booking(models.Model):
     movie = models.CharField(choices=[(movie.title, movie.title) for movie in Movie.objects.all()], max_length=100)
     date = models.DateField(default=timezone.now())
-    seat = models.CharField(choices=[(seat.seatNum, seat.seatNum) for seat in Seat.objects.all() if seat.status != 'R'], max_length=10, unique_for_date='date', unique=True)
+    seat = models.CharField(choices=[(movieSeat.seatNum, movieSeat.seatNum) for movieSeat in Seat.objects.all() if movieSeat.status != 'Reserved'], max_length=10)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    for seatInst in Seat.objects.all():
-        if seatInst.seatNum == seat:
-            seatInst.status = 'R'
-            seatInst.save()
-            break
-
+    
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['movie', 'seat'], name='one_seat_per_person')
+            models.UniqueConstraint(fields=['movie', 'seat', 'date'], name='one_seat_per_person_per_day')
         ]
