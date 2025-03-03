@@ -20,6 +20,7 @@ class MovieSerializer(serializers.Serializer):
         return instance
 
 class SeatSerializer(serializers.Serializer):
+    movie = serializers.CharField(read_only=True)
     seatNum = serializers.CharField(read_only=True)
     status = serializers.CharField(read_only=True)
 
@@ -39,9 +40,11 @@ class BookingSerializer(serializers.Serializer):
     date = serializers.DateField(required=True)
     seat = serializers.ChoiceField(choices=seats)
 
+
     def create(self, validated_data):
         # include current user when creating new booking
         return Booking.objects.create(user=self.context['request'].user, **validated_data)
+
     
         
 

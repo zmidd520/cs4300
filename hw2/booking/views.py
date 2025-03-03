@@ -29,6 +29,8 @@ def book_seat(request, movie_id):
     movie = Movie.objects.get(pk=movie_id)
     form = BookingForm()
 
+    form.fields['seat'].queryset = Seat.objects.filter(movie=movie)
+
     context = {'movie': movie, 'form': form}
 
     if request.method == "POST":
@@ -41,10 +43,8 @@ def book_seat(request, movie_id):
             booking.user = request.user
             booking.movie = movie.title
             seat = Seat.objects.get(seatNum=booking.seat)
-            print(seat.seatNum + ' - ' + seat.status)
             seat.status = 'R'
             seat.save()
-            print(seat.seatNum + ' - ' + seat.status)
 
             # attempt to book seat
             try:

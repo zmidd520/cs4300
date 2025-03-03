@@ -31,13 +31,15 @@ class Seat(models.Model):
     seatNum = models.CharField(max_length=50, choices=SEATS)
     status = models.CharField(max_length=50, choices=STATUS, default='A') 
 
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, default=1)
+
     def __str__(self):
         return self.seatNum
 
 class Booking(models.Model):
     movie = models.CharField(choices=[(movie.title, movie.title) for movie in Movie.objects.all()], max_length=100)
     date = models.DateField(default=timezone.now().date())
-    seat = models.CharField(choices=[(movieSeat.seatNum, movieSeat.seatNum) for movieSeat in Seat.objects.all()], max_length=10)
+    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     
     class Meta:
