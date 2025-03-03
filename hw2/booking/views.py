@@ -42,9 +42,8 @@ def book_seat(request, movie_id):
             booking = form.save(commit=False)
             booking.user = request.user
             booking.movie = movie.title
-            seat = Seat.objects.get(seatNum=booking.seat)
-            seat.status = 'R'
-            seat.save()
+            booking.seat.status = 'R'
+            booking.seat.save()
 
             # attempt to book seat
             try:
