@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from booking.serializers import *
+from django.utils import timezone
 
 # Web Views
 def movie_list(request):
@@ -81,17 +82,32 @@ def registerPage(request):
       context = {'form': form}
       return render(request, 'registration/register.html', context)
 
+# update seat booking status to reflect the day's bookings
+def setSeats(request):
+    for seat in Seat.objects.all():
+        for booking in Booking.objects.all():
+            if seat.seatNum == booking.seat and booking.date == timezone.now().date():
+                seat.status = 'R'
+            else:
+                seat.status = 'A'
+    return(redirect('movie_list'))
+
+
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 
-class BookSeatViewSet(viewsets.ModelViewSet):
+class SeatViewSet(viewsets.ModelViewSet):
+    queryset = Seat.objects.all()
+    serializer_class = SeatSerializer
+
+class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
-    serializer_class = BookSeatSerializer
+    serializer_class = BookingSerializer
 
     # handle potention IntegrityError
     def create(self, request, *args, **kwargs):
         try:
             return super().create(request, *args, **kwargs)
         except IntegrityError:
-            return Response({'Reserved Seat': 'That seat has been booked for this day, please choose a different seat or book for a later date'}, status=400)
+            return Response({'seat': 'That seat has been booked for this day, please choose a different seat or book for a later date'}, status=400)

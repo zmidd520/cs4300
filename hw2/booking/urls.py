@@ -5,7 +5,8 @@ from rest_framework import routers
 # Router setup
 router = routers.DefaultRouter()
 router.register(r'movies', views.MovieViewSet)
-router.register(r'bookseats', views.BookSeatViewSet)
+router.register(r'seats', views.SeatViewSet)
+router.register(r'bookings', views.BookingViewSet)
 
 urlpatterns = [
     # api
@@ -19,5 +20,7 @@ urlpatterns = [
     path('user/<int:user_id>/bookings', views.booking_list, name='booking_list'),
 
     path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/register/', views.registerPage, name='register_page')
+    path('accounts/register/', views.registerPage, name='register_page'),
+
+    path('seats/', views.setSeats, name='setSeats')
 ]

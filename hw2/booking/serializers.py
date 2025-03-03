@@ -19,8 +19,14 @@ class MovieSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-class BookSeatSerializer(serializers.Serializer):
+class SeatSerializer(serializers.Serializer):
+    seatNum = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
+
+class BookingSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
+
+    # get lists of movie names and seat numbers
     movies = []
     for movie in Movie.objects.all():
         movies.append(movie.title)
@@ -34,6 +40,7 @@ class BookSeatSerializer(serializers.Serializer):
     seat = serializers.ChoiceField(choices=seats)
 
     def create(self, validated_data):
+        # include current user when creating new booking
         return Booking.objects.create(user=self.context['request'].user, **validated_data)
     
         
