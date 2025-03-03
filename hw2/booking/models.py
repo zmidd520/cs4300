@@ -36,8 +36,8 @@ class Seat(models.Model):
 
 class Booking(models.Model):
     movie = models.CharField(choices=[(movie.title, movie.title) for movie in Movie.objects.all()], max_length=100)
-    date = models.DateField(default=timezone.now())
-    seat = models.CharField(choices=[(movieSeat.seatNum, movieSeat.seatNum) for movieSeat in Seat.objects.all() if movieSeat.status != 'Reserved'], max_length=10)
+    date = models.DateField(default=timezone.now().date())
+    seat = models.CharField(choices=[(movieSeat.seatNum, movieSeat.seatNum) for movieSeat in Seat.objects.all()], max_length=10)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     
     class Meta:

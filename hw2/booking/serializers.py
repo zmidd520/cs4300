@@ -1,5 +1,5 @@
 from rest_framework import serializers
-import booking.models
+from .models import *
 
 class MovieSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -18,3 +18,23 @@ class MovieSerializer(serializers.Serializer):
         instance.duration = validated_data.get('duration', instance.duration)
         instance.save()
         return instance
+
+class BookSeatSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    movies = []
+    for movie in Movie.objects.all():
+        movies.append(movie.title)
+
+    seats = []
+    for seat in Seat.objects.all():
+        seats.append(seat.seatNum)
+
+    movie = serializers.ChoiceField(choices=movies)
+    date = serializers.DateField(required=True)
+    seat = serializers.ChoiceField(choices=seats)
+
+    def create(self, validated_data):
+        return Booking.objects.create(user=self.context['request'].user, **validated_data)
+    
+        
+

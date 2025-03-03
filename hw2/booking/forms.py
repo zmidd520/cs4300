@@ -17,12 +17,6 @@ class BookingForm(forms.ModelForm):
         model = Booking
         fields = ('date', 'seat')
 
-        error_messages = {
-            'seat': {
-                'unique_for_date': "This seat is reserved, please choose a different seat",
-                'one_seat_per_person': "This seat is reserved, please choose a different seat"},
-        }
-
 class CreateUserForm(UserCreationForm):
     class Meta:
         model = User

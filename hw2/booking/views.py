@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
-from booking.serializers import MovieSerializer
+from booking.serializers import *
 
 # Web Views
 def movie_list(request):
@@ -39,6 +39,11 @@ def book_seat(request, movie_id):
             booking = form.save(commit=False)
             booking.user = request.user
             booking.movie = movie.title
+            seat = Seat.objects.get(seatNum=booking.seat)
+            print(seat.seatNum + ' - ' + seat.status)
+            seat.status = 'R'
+            seat.save()
+            print(seat.seatNum + ' - ' + seat.status)
 
             # attempt to book seat
             try:
@@ -79,3 +84,14 @@ def registerPage(request):
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+
+class BookSeatViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookSeatSerializer
+
+    # handle potention IntegrityError
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return Response({'Reserved Seat': 'That seat has been booked for this day, please choose a different seat or book for a later date'}, status=400)
