@@ -3,6 +3,9 @@ from django.urls import reverse
 from .models import *
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
+from rest_framework import status
+from .serializers import *
+import datetime
 
 # Create your tests here.
 class ModelTests(TestCase):
@@ -33,3 +36,66 @@ class ModelTests(TestCase):
         self.assertEqual(self.booking.seat, self.seat)
         self.assertEqual(self.booking.user, self.user)
 
+# test CRUD operations for movie objects
+class TestMovieView(APITestCase):
+    # set up test objects
+    def setUp(self):
+        self.user = User.objects.create(username='testuser', email='test@test.test')
+        self.client.force_authenticate(user=self.user)
+        self.movie = Movie.objects.create(title='Test Movie', description='testing', releaseDate='2025-03-03', duration='02:00:00')
+
+    # test that the list of movies is returned correctly
+    def test_get_movie(self):
+        url = reverse('movies-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        serializer_data = MovieSerializer([self.movie], many=True).data
+        self.assertEqual(response.data, serializer_data)
+
+    # test that a movie can be added via the api
+    def test_add_movie(self):
+        url = reverse('movies-list')
+        movie_info = {
+            'title': 'New Movie',
+            'description': 'movie added via API',
+            'releaseDate': '2025-03-04',
+            'duration': '01:30'
+        }
+        response = self.client.post(url, movie_info)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        movie = Movie.objects.get(title='New Movie')
+        
+        self.assertEqual(movie_info['title'], movie.title)
+        self.assertEqual(movie_info['description'], movie.description)
+        self.assertEqual(movie_info['releaseDate'], movie.releaseDate.strftime('%Y-%m-%d'))
+        self.assertEqual(datetime.datetime.strptime(movie_info['duration'], '%H:%M').time(), movie.duration)
+
+    # test that a movie can be retrieved via the api
+    def test_retrieve_movie(self):
+        url = reverse('movies-detail', args=[self.movie.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        serializer_data = MovieSerializer(self.movie).data
+        self.assertEqual(response.data, serializer_data)
+
+    # test that a movie can be updated via the api
+    def test_update_movie(self):
+        url = reverse('movies-detail', args=[self.movie.pk])
+        movie_info = {
+            'title': 'Updated Movie',
+            'description': 'movie updated via API',
+            'releaseDate': '2025-03-05',
+            'duration': '02:00'
+        }
+        response = self.client.put(url, movie_info)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        movie = Movie.objects.get(pk=self.movie.pk)
+        self.assertEqual(movie.title, movie_info['title'])
+
+    # test that a movie can be deleted via the api
+    def test_delete_movie(self):
+        url = reverse('movies-detail', args=[self.movie.pk])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Movie.objects.filter(pk=self.movie.pk).exists())
