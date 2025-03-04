@@ -45,7 +45,7 @@ class TestMovieView(APITestCase):
         self.movie = Movie.objects.create(title='Test Movie', description='testing', releaseDate='2025-03-03', duration='02:00:00')
 
     # test that the list of movies is returned correctly
-    def test_get_movie(self):
+    def test_get_movies(self):
         url = reverse('movies-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -99,3 +99,21 @@ class TestMovieView(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Movie.objects.filter(pk=self.movie.pk).exists())
+
+# test that the API returns a list of seats in the theater
+class TestSeatView(APITestCase):
+    # set up test objects
+    def setUp(self):
+        self.user = User.objects.create(username='testuser', email='test@test.test')
+        self.client.force_authenticate(user=self.user)
+        self.movie = Movie.objects.create(title='Test Movie', description='testing', releaseDate='2025-03-03', duration='02:00:00')
+        self.seat1 = Seat.objects.create(seatNum='A1', status='A', movie=self.movie)
+        self.seat2 = Seat.objects.create(seatNum='A2', status='R', movie=self.movie)
+
+    # test that the list of movies is returned correctly
+    def test_get_seats(self):
+        url = reverse('seats-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        serializer_data = SeatSerializer([self.seat1, self.seat2], many=True).data
+        self.assertEqual(response.data, serializer_data)

@@ -5,8 +5,8 @@ from rest_framework import routers
 # Router setup
 router = routers.DefaultRouter()
 router.register(r'movies', views.MovieViewSet, basename='movies')
-router.register(r'seats', views.SeatViewSet)
-router.register(r'bookings', views.BookingViewSet)
+router.register(r'seats', views.SeatViewSet, basename='seats')
+router.register(r'bookings', views.BookingViewSet, basename='bookings')
 
 urlpatterns = [
     # api
