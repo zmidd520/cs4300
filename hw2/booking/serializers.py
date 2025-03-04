@@ -32,14 +32,9 @@ class BookingSerializer(serializers.Serializer):
     for movie in Movie.objects.all():
         movies.append(movie.title)
 
-    seats = []
-    for seat in Seat.objects.all():
-        seats.append(seat.seatNum)
-
     movie = serializers.ChoiceField(choices=movies)
     date = serializers.DateField(required=True)
-    seat = serializers.ChoiceField(choices=seats)
-
+    seat = serializers.PrimaryKeyRelatedField(queryset=Seat.objects.all())
 
     def create(self, validated_data):
         # include current user when creating new booking

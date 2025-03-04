@@ -110,10 +110,59 @@ class TestSeatView(APITestCase):
         self.seat1 = Seat.objects.create(seatNum='A1', status='A', movie=self.movie)
         self.seat2 = Seat.objects.create(seatNum='A2', status='R', movie=self.movie)
 
-    # test that the list of movies is returned correctly
+    # test that the list of seats is returned correctly
     def test_get_seats(self):
         url = reverse('seats-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer_data = SeatSerializer([self.seat1, self.seat2], many=True).data
         self.assertEqual(response.data, serializer_data)
+
+# test that bookings can be made and history can be viewed via the API
+class TestBookingView(APITestCase):
+    # set up test objects
+    def setUp(self):
+        self.user = User.objects.create(username='testuser', email='test@test.test')
+        self.client.force_authenticate(user=self.user)
+        self.movie = Movie.objects.create(title='Test Movie', description='testing', releaseDate='2025-03-03', duration='02:00')
+        self.seat1 = Seat.objects.create(seatNum='A1', status='A', movie=self.movie)
+        self.seat2 = Seat.objects.create(seatNum='A2', status='A', movie=self.movie)
+        self.seat3 = Seat.objects.create(seatNum='C3', status='A', movie=self.movie)
+        self.booking1 = Booking.objects.create(movie='Test Movie', date='2025-03-03', seat=self.seat1, user=self.user)
+        self.booking2 = Booking.objects.create(movie='Test Movie', date='2025-03-03', seat=self.seat2, user=self.user)
+
+    # test that the list of bookings is returned correctly
+    def test_get_bookings(self):
+        url = reverse('bookings-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        serializer_data = BookingSerializer([self.booking1, self.booking2], many=True).data
+        self.assertEqual(response.data, serializer_data)
+
+    # test that a booking can be made via the api
+    def test_create_booking(self):
+        url = reverse('bookings-list')
+        booking_info = {
+            'movie': 'Dog Man',     # test only works with movies in "prod" database
+            'date': '2025-03-03',
+            'seat': self.seat3.pk,
+            'user': self.user
+        }
+        response = self.client.post(url, booking_info)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    # test that the api catches duplicate seat/date selections
+    def test_dupe_booking(self):
+        url = reverse('bookings-list')
+        booking_info = {
+            'movie': 'Dog Man',     # test only works with movies in "prod" database
+            'date': '2025-03-03',
+            'seat': self.seat3.pk,
+            'user': self.user
+        }
+        response = self.client.post(url, booking_info)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.post(url, booking_info)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # my custom error response uses 400 as the response code
+        
