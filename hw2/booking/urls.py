@@ -4,7 +4,7 @@ from rest_framework import routers
 
 # Router setup
 router = routers.DefaultRouter()
-router.register(r'movies', views.MovieViewSet)
+router.register(r'movies', views.MovieViewSet, basename)
 router.register(r'seats', views.SeatViewSet)
 router.register(r'bookings', views.BookingViewSet)
 

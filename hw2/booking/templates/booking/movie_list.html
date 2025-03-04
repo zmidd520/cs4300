@@ -8,7 +8,8 @@
         <li class="list-group-item">
             <p><strong>{{ movie.title }}</strong></p>
             <p>{{ movie.description }}</p>
-            <a class="btn btn-primary" href="{% url 'book_seat' movie.id %}" role="button">Book Seat</a>
+            <p>Released: {{ movie.releaseDate }}</p>
+            <a class="btn btn-primary" href="{% url 'book_seat' movie.id %}" role="button">Book a Seat</a>
         </li>
         {% endfor %}
     </ul>

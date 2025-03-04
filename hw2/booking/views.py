@@ -21,7 +21,7 @@ def movie_list(request):
 def booking_list(request, user_id):
     bookings = Booking.objects.all()
 
-    context = {'bookings': bookings}
+    context = {'bookings': bookings, 'today': timezone.now().date()}
     return render(request, 'booking/booking_list.html', context)
 
 @login_required
