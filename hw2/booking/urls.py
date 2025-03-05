@@ -19,8 +19,10 @@ urlpatterns = [
     path('book/<int:movie_id>', views.book_seat, name='book_seat'),
     path('user/<int:user_id>/bookings', views.booking_list, name='booking_list'),
 
+    # account management
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', views.registerPage, name='register_page'),
 
+    # update seat information in database so the API returns the intended info
     path('seats/', views.setSeats, name='setSeats')
 ]

@@ -89,9 +89,10 @@ def setSeats(request):
                 seat.status = 'R'
             else:
                 seat.status = 'A'
+            seat.save()
     return(redirect('movie_list'))
 
-
+# API ViewSets
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer

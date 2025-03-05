@@ -27,7 +27,7 @@ class SeatSerializer(serializers.Serializer):
 class BookingSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
 
-    # get lists of movie names and seat numbers
+    # get lists of movie names
     movies = []
     for movie in Movie.objects.all():
         movies.append(movie.title)

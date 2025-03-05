@@ -31,6 +31,7 @@ class Seat(models.Model):
     seatNum = models.CharField(max_length=50, choices=SEATS)
     status = models.CharField(max_length=50, choices=STATUS, default='A') 
 
+    # tie each seat to a specific movie
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
@@ -44,5 +45,6 @@ class Booking(models.Model):
     
     class Meta:
         constraints = [
+            # prevent duplicate seat bookings
             models.UniqueConstraint(fields=['movie', 'seat', 'date'], name='one_seat_per_person_per_day')
         ]
